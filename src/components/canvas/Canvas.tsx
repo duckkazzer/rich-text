@@ -1,25 +1,41 @@
-import { useState } from "react";
-import { Layer, Stage } from "react-konva";
-import Shape from "../shape/Shape";
+import React, { useState, RefObject } from 'react';
+import { Stage, Layer } from 'react-konva';
+import Konva from 'konva';
+import Shape from '../shape/Shape';
+import styles from './Canvas.module.scss';
 
-const Canvas = ({ tool, stageRef }: any) => {
-  const [figures, setFigures] = useState<any>([]);
+interface ShapeProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tool: string;
+  id: number;
+  text: string;
+}
 
-  const handleOnClick = (e: any) => {
+interface CanvasProps {
+  tool: string;
+  stageRef: RefObject<Konva.Stage>;
+}
+
+const Canvas: React.FC<CanvasProps> = ({ tool, stageRef}) => {
+  const [shapes, setShapes] = useState<ShapeProps[]>([]);
+
+  const handleOnClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     if (tool === "cursor") return;
     const stage = e.target.getStage();
-    const stageOffset = stage.absolutePosition();
-    const point = stage.getPointerPosition();
-    setFigures((prev: any) => [
+    const stageOffset = stage?.absolutePosition() || { x: 0, y: 0 };
+    const point = stage?.getPointerPosition() || { x: 0, y: 0 };
+    setShapes((prev: ShapeProps[]) => [
       ...prev,
       {
-        id: Date.now().toString(36),
+        id: Date.now(),
         width: 100,
         height: 100,
-        type: "rect",
         x: point.x - stageOffset.x,
         y: point.y - stageOffset.y,
-        html: "",
+        tool: tool,
         text: "",
       },
     ]);
@@ -32,11 +48,12 @@ const Canvas = ({ tool, stageRef }: any) => {
       draggable={tool === "cursor"}
       onClick={handleOnClick}
       ref={stageRef}
+      className={styles.canvas}
     >
       <Layer>
-        {figures.map((figure: any, i: number) => {
-          return <Shape key={i} {...figure} stageRef={stageRef} tool={tool} />;
-        })}
+        {shapes.map((shape, i) => (
+          <Shape key={i} {...shape} tool={tool} />
+        ))}
       </Layer>
     </Stage>
   );

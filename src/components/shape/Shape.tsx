@@ -1,75 +1,49 @@
-import html2canvas from "html2canvas";
-import Konva from "konva";
-import { useEffect, useRef, useState } from "react";
-import { Group, Rect } from "react-konva";
-import { Html } from "react-konva-utils";
-import HtmlText from "../htmlText/HtmlText";
+import React, { useState } from 'react';
+import { Group, Rect, Image } from 'react-konva';
+import { Html } from 'react-konva-utils';
+import TextEditor from '../textEditor/TextEditor';
 
-const Shape = (props: any) => {
-  const { x, y, width, height, tool, html, id, text } = props;
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(text);
+interface ShapeProps {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tool: string;
+  text: string;
+}
 
-  const groupRef = useRef<any>(null);
-  const imageRef = useRef<any>(null);
-  const htmlRef = useRef<any>(null);
-  const renderImage = async () => {
-    const htmltext = document.getElementById(`htmltext_${id}`);
-    if (htmltext) {
-      const innerhtml = htmltext.innerHTML;
-      if (innerhtml) {
-        const canvas = await html2canvas(htmltext, {
-          backgroundColor: "rgba(0,0,0,0)",
-        });
-        const shape = new Konva.Image({
-          x: 0,
-          y: height / 2,
-          scaleX: 1 / window.devicePixelRatio,
-          scaleY: 1 / window.devicePixelRatio,
-          image: canvas,
-        });
-        groupRef.current.add(shape);
-        imageRef.current = shape;
-      } else return;
-    } else return;
-  };
+const Shape: React.FC<ShapeProps> = ({ x, y, width, height, tool, text, id }) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [value, setValue] = useState<string>(text);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
 
-  useEffect(() => {
-    renderImage();
-  }, []);
 
   const handleClick = () => {
-    if (tool === "shape") {
+    if (tool === 'shape') {
       return;
     } else {
       setIsEditing((prev) => !prev);
-      if (imageRef.current) {
-        if (isEditing) {
-          imageRef.current.show();
-        } else {
-          imageRef.current.hide();
-        }
-      } else return;
     }
   };
 
-  const handleInput = (e: any) => {
-    setValue(e.target.value);
+  const handleSaveText = (content: string, img: HTMLImageElement) => {
+    setValue(content);
+    setImage(img);
+    setIsEditing(false);
   };
 
   return (
     <>
-      <Group x={x} y={y} onClick={handleClick} ref={groupRef} draggable>
-        <Rect stroke={"black"} width={width} height={height} />
+      <Group x={x} y={y} onClick={handleClick} id={id.toString()} draggable>
+        <Rect stroke={'black'} width={width} height={height} />
+        {image && <Image image={image} />}
         {isEditing && (
           <Html>
-            <textarea value={value} onChange={handleInput} />
+            <TextEditor onSave={handleSaveText} initialContent={value} width={width} height={height} />
           </Html>
         )}
       </Group>
-      <Html>
-        <HtmlText ref={htmlRef} html={html} id={id} />
-      </Html>
     </>
   );
 };
