@@ -65,10 +65,14 @@ rich-text/
 ```
 ## Структура проекта
 Проект использует следующие библиотеки:
-    1. [Konva](https://konvajs.org/)
-    2. [React-Konva](https://konvajs.org/docs/react/)
-    3. [React-Quill](https://github.com/zenoamaro/react-quill)
-    4. [html2canvas](https://html2canvas.hertzen.com/)
+
+1. [Konva](https://konvajs.org/)
+
+2. [React-Konva](https://konvajs.org/docs/react/)
+
+3. [React-Quill](https://github.com/zenoamaro/react-quill)
+
+4. [html2canvas](https://html2canvas.hertzen.com/)
 
 ## Задачи
 1. Добавить стили для компонентов.
